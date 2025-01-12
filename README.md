@@ -24,7 +24,7 @@ fmt.Println(t.Format("2006-01-02"))  // Consistently uses UTC
 
 Install the binary from source by running:
 ```bash
-go install github.com/kitmark/timeloc/cmd/timeloc@latest
+go install github.com/kitimark/timeloc/cmd/timeloc@latest
 ```
 
 Then, run the linter by:
