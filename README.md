@@ -132,7 +132,10 @@ While time.Parse and the system timezone provide default location settings, rely
 
 This analyzer enforces explicit location setting to ensure consistent behavior across all environments.
 
-## Contributing
+## Support
+Please feel free to [open a GitHub issue](https://github.com/kitimark/timeloc/issues) if you have any questions, bug reports, and feature requests.
+
+## Contributions
 
 Pull requests are welcome! Please ensure tests pass by running:
 

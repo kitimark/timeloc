@@ -225,7 +225,12 @@ func (s *state) getReceiverVar(call *ast.CallExpr) (*types.Var, bool) {
 
 func (s *state) isTimeType(t types.Type) bool {
 	if named, ok := t.(*types.Named); ok {
-		return named.Obj().Pkg().Path() == "time" && named.Obj().Name() == "Time"
+		pkg := named.Obj().Pkg()
+		// ignore built-in interface. for instance, error type
+		if pkg == nil {
+			return false
+		}
+		return pkg.Path() == "time" && named.Obj().Name() == "Time"
 	}
 	return false
 }

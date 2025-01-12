@@ -13,5 +13,19 @@ import (
 
 func TestTimeLocAnalyzer(t *testing.T) {
 	testdata := analysistest.TestData()
-	analysistest.Run(t, testdata, Analyzer, "timelocusage")
+
+	testcases := []struct {
+		name     string
+		patterns string
+	}{
+		{name: "TimeLocUsage", patterns: "timelocusage"},
+		{name: "Issues", patterns: "issues"},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			analysistest.Run(t, testdata, Analyzer, tc.patterns)
+		})
+	}
 }
