@@ -231,6 +231,33 @@ func TimeParseUsage() {
 	nestedFormatTime3(t)
 }
 
+func TimeDateUsage() {
+	t := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	_ = t.Format("2006-01-02")
+	_ = t.AppendFormat(nil, "2006-01-02")
+	_, _, _ = t.Clock()
+	_, _, _ = t.Date()
+	_ = t.Day()
+	_ = t.Hour()
+	_, _ = t.ISOWeek()
+	_ = t.Minute()
+	_ = t.Month()
+	_ = t.Second()
+	_ = t.Weekday()
+	_ = t.Year()
+	_ = t.YearDay()
+
+	formatAllMethods(t)
+	formatTime(t)
+	nestedFormatAllMethods(t)
+	nestedFormatTime(t)
+	nestedFormatAllMethods2(t)
+	nestedFormatTime2(t)
+	nestedFormatAllMethods3(t)
+	nestedFormatTime3(t)
+}
+
 func badUsageInSubFunc() {
 	t := time.Now()
 
