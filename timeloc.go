@@ -17,10 +17,11 @@ import (
 
 var Analyzer = &analysis.Analyzer{
 	Name: "timeloc",
-	Doc: `Detects time.Time methods used without setting location. Many time.Time methods 
-depend on the location (timezone) setting. If not explicitly set, these methods will use the system default timezone, 
+	Doc: `Detects time.Time methods used without setting location and prevents time.Local usage. 
+Many time.Time methods depend on the location (timezone) setting. If not explicitly set, these methods will use the system default timezone, 
 which can lead to inconsistencies across different environments. This analyzer enforces explicit location setting
-through time.In(), time.ParseInLocation(), or functions that internally set location.`,
+through time.In(), time.ParseInLocation(), or functions that internally set location. It also prevents usage of time.Local
+which relies on system timezone.`,
 	Run: run,
 	Requires: []*analysis.Analyzer{
 		inspect.Analyzer,
@@ -175,7 +176,33 @@ func (s *state) handleAssign(assign *ast.AssignStmt) {
 }
 
 func (s *state) handleCall(call *ast.CallExpr) {
-	// update location status for method receiver
+	// check for time.Local usage in various contexts
+	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+		if x, ok := sel.X.(*ast.Ident); ok {
+			if x.Name == "time" {
+				// check time.ParseInLocation with time.Local
+				if sel.Sel.Name == "ParseInLocation" && len(call.Args) >= 3 {
+					if s.isTimeLocal(call.Args[2]) {
+						s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
+					}
+				}
+				// check time.Date with time.Local
+				if sel.Sel.Name == "Date" && len(call.Args) >= 8 {
+					if s.isTimeLocal(call.Args[7]) {
+						s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
+					}
+				}
+			}
+		}
+		// check t.In(time.Local)
+		if sel.Sel.Name == "In" && len(call.Args) > 0 {
+			if s.isTimeLocal(call.Args[0]) {
+				s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
+			}
+		}
+	}
+
+	// continue with existing time location checks
 	if s.isInCall(call) {
 		if rec, ok := s.getReceiverVar(call); ok {
 			s.timeVars[rec] = true
@@ -221,6 +248,15 @@ func (s *state) getReceiverVar(call *ast.CallExpr) (*types.Var, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (s *state) isTimeLocal(expr ast.Expr) bool {
+	if sel, ok := expr.(*ast.SelectorExpr); ok {
+		if id, ok := sel.X.(*ast.Ident); ok {
+			return id.Name == "time" && sel.Sel.Name == "Local"
+		}
+	}
+	return false
 }
 
 func (s *state) isTimeType(t types.Type) bool {
