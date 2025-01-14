@@ -1,16 +1,23 @@
 # TimeLoc
 
-A golangci-lint analyzer to ensure proper `time.Location` handling in Go codebases. This analyzer helps prevent common timezone-related bugs by enforcing explicit time zone settings before using time-dependent methods.
+A golangci-lint analyzer to ensure proper `time.Location` handling in Go codebases. This analyzer helps prevent common timezone-related bugs by enforcing explicit time zone settings before using time-dependent methods and prevents the usage of system-dependent `time.Local`.
 
 ## Problem
 
 When working with `time.Time` methods, many operations depend on the location (timezone) setting. If not explicitly set, these methods default to using the system's local timezone. This implicit behavior makes your code vulnerable to environment-specific bugs, as the same code can produce different results depending on the server's timezone configuration.
+
+The analyzer also prevents the usage of `time.Local` as it relies on the system timezone, which can vary across different environments.
 
 Examples of potentially problematic code:
 ```go
 // BAD: Using time methods without setting location
 t := time.Now()
 fmt.Println(t.Format("2006-01-02"))  // Uses system timezone
+
+// BAD: Using time.Local which relies on system timezone
+t := time.Now().In(time.Local)       // Will trigger an error
+t, _ := time.ParseInLocation("2006-01-02", "2025-01-01", time.Local)  // Will trigger an error
+t := time.Date(2025, 1, 1, 0, 0, 0, 0, time.Local)  // Will trigger an error
 
 // GOOD: Explicitly set location before using time methods
 t := time.Now()
@@ -59,6 +66,13 @@ The analyzer checks for usage of the following time.Time methods without explici
 
 The analyzer also tracks time.Time values passed to functions to ensure they have location set before being used with time-dependent methods.
 
+### time.Local Usage
+
+The analyzer checks and prevents the use of `time.Local` in the following contexts:
+- `time.ParseInLocation(..., time.Local)`
+- `time.Date(..., time.Local)`
+- `someTime.In(time.Local)`
+
 ### Supported Location Setting Methods
 
 The analyzer recognizes location setting through:
@@ -83,7 +97,10 @@ func badUsage() {
     fmt.Println(t.Format("2006-01-02"))  // Analyzer reports error: (t time.Time).Format called on t before setting time.Location
     
     // Passing to function without location
-    formatTime(t)  // Analyzer reports error: (t time.Time).Format called on t before setting time.Location
+    formatTime(t)  // Analyzer reports error: passing time.Time value without location set to function that may use location-dependent methods
+ 
+    // Using time.Local (will trigger errors)
+    t = t.In(time.Local)  // Analyzer reports error: time.Local usage is not allowed as it relies on system timezone
 }
 
 func formatTime(t time.Time) string {
@@ -102,7 +119,7 @@ func goodUsage() {
     formatTime(t)
 }
 
-// Using ParseInLocation is also good
+// Using ParseInLocation with explicit timezone is good
 func parseExample() {
     t, _ := time.ParseInLocation("2006-01-02", "2025-01-01", time.UTC)
     fmt.Println(t.Format("2006-01-02"))  // Fine because location is set
@@ -111,7 +128,7 @@ func parseExample() {
 
 ## Error Messages
 
-The analyzer produces two types of error messages:
+The analyzer produces three types of error messages:
 
 1. For direct method calls:
    ```
@@ -123,14 +140,20 @@ The analyzer produces two types of error messages:
    passing time.Time value without location set to function that may use location-dependent methods
    ```
 
+3. For time.Local usage:
+   ```
+   time.Local usage is not allowed as it relies on system timezone
+   ```
+
 ## Why Not Trust Default Location?
 
 While time.Parse and the system timezone provide default location settings, relying on these can lead to issues:
 - System timezone can vary between development, testing, and production environments
 - Docker containers might have different timezone settings
 - Application deployments across different regions might behave differently
+- Using time.Local makes your code dependent on the host system's timezone configuration
 
-This analyzer enforces explicit location setting to ensure consistent behavior across all environments.
+This analyzer enforces explicit location setting and prevents time.Local usage to ensure consistent behavior across all environments.
 
 ## Support
 Please feel free to [open a GitHub issue](https://github.com/kitimark/timeloc/issues) if you have any questions, bug reports, and feature requests.

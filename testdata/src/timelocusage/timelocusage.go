@@ -343,3 +343,28 @@ func TimeParseBadUsage() {
 	nestedFormatAllMethods3(t) // want "passing time.Time value without location set to function that may use location-dependent methods"
 	nestedFormatTime3(t)       // want "passing time.Time value without location set to function that may use location-dependent methods"
 }
+
+func subFunctionTimeLocalBadUsage() {
+	_, _ = time.ParseInLocation(time.DateOnly, "2025-01-01", time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+
+	_ = time.Date(2025, 1, 1, 0, 0, 0, 0, time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+
+	t := time.Now()
+	t = t.In(time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+}
+
+func nestedSubFunctionTimeLocalBadUsage() {
+	subFunctionTimeLocalBadUsage()
+}
+
+func TimeLocalBadUsage() {
+	_, _ = time.ParseInLocation(time.DateOnly, "2025-01-01", time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+
+	_ = time.Date(2025, 1, 1, 0, 0, 0, 0, time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+
+	t := time.Now()
+	t = t.In(time.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+
+	subFunctionTimeLocalBadUsage()
+	nestedSubFunctionTimeLocalBadUsage()
+}
