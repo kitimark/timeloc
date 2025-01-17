@@ -73,6 +73,10 @@ The analyzer checks and prevents the use of `time.Local` in the following contex
 - `time.Date(..., time.Local)`
 - `someTime.In(time.Local)`
 
+### Import Aliases
+
+This check works even when the time package is imported with an alias.
+
 ### Supported Location Setting Methods
 
 The analyzer recognizes location setting through:

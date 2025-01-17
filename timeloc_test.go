@@ -19,6 +19,7 @@ func TestTimeLocAnalyzer(t *testing.T) {
 		patterns string
 	}{
 		{name: "TimeLocUsage", patterns: "timelocusage"},
+		{name: "AliasTimePackage", patterns: "aliastimepackage"},
 		{name: "Issues", patterns: "issues"},
 	}
 
