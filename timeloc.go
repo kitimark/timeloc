@@ -28,6 +28,8 @@ which relies on system timezone.`,
 	},
 }
 
+const timePackagePath = "time"
+
 var targetMethods = map[string]bool{
 	"AppendFormat": true,
 	"Clock":        true,
@@ -178,31 +180,29 @@ func (s *state) handleAssign(assign *ast.AssignStmt) {
 func (s *state) handleCall(call *ast.CallExpr) {
 	// check for time.Local usage in various contexts
 	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if x, ok := sel.X.(*ast.Ident); ok {
-			if x.Name == "time" {
-				// check time.ParseInLocation with time.Local
-				if sel.Sel.Name == "ParseInLocation" && len(call.Args) >= 3 {
-					if s.isTimeLocal(call.Args[2]) {
-						s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
-					}
+		if pkg := s.getTimePackage(sel.X); pkg != nil {
+			// check time.ParseInLocation with time.Local
+			if sel.Sel.Name == "ParseInLocation" && len(call.Args) >= 3 {
+				if s.isTimeLocal(call.Args[2]) {
+					s.pass.Reportf(call.Args[2].Pos(), "time.Local usage is not allowed as it relies on system timezone")
 				}
-				// check time.Date with time.Local
-				if sel.Sel.Name == "Date" && len(call.Args) >= 8 {
-					if s.isTimeLocal(call.Args[7]) {
-						s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
-					}
+			}
+			// check time.Date with time.Local
+			if sel.Sel.Name == "Date" && len(call.Args) >= 8 {
+				if s.isTimeLocal(call.Args[7]) {
+					s.pass.Reportf(call.Args[7].Pos(), "time.Local usage is not allowed as it relies on system timezone")
 				}
 			}
 		}
 		// check t.In(time.Local)
 		if sel.Sel.Name == "In" && len(call.Args) > 0 {
 			if s.isTimeLocal(call.Args[0]) {
-				s.pass.Reportf(call.Pos(), "time.Local usage is not allowed as it relies on system timezone")
+				s.pass.Reportf(call.Args[0].Pos(), "time.Local usage is not allowed as it relies on system timezone")
 			}
 		}
 	}
 
-	// continue with existing time location checks
+	// continue with other time location checks
 	if s.isInCall(call) {
 		if rec, ok := s.getReceiverVar(call); ok {
 			s.timeVars[rec] = true
@@ -250,10 +250,27 @@ func (s *state) getReceiverVar(call *ast.CallExpr) (*types.Var, bool) {
 	return nil, false
 }
 
+func (s *state) isTimePackage(pkg *types.Package) bool {
+	return pkg != nil && pkg.Path() == timePackagePath
+}
+
+func (s *state) getTimePackage(expr ast.Expr) *types.Package {
+	if id, ok := expr.(*ast.Ident); ok {
+		if obj := s.pass.TypesInfo.ObjectOf(id); obj != nil {
+			if pkg, ok := obj.(*types.PkgName); ok {
+				if s.isTimePackage(pkg.Imported()) {
+					return pkg.Imported()
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (s *state) isTimeLocal(expr ast.Expr) bool {
 	if sel, ok := expr.(*ast.SelectorExpr); ok {
-		if id, ok := sel.X.(*ast.Ident); ok {
-			return id.Name == "time" && sel.Sel.Name == "Local"
+		if pkg := s.getTimePackage(sel.X); pkg != nil {
+			return sel.Sel.Name == "Local"
 		}
 	}
 	return false
@@ -266,15 +283,15 @@ func (s *state) isTimeType(t types.Type) bool {
 		if pkg == nil {
 			return false
 		}
-		return pkg.Path() == "time" && named.Obj().Name() == "Time"
+		return s.isTimePackage(pkg) && named.Obj().Name() == "Time"
 	}
 	return false
 }
 
 func (s *state) isTimeNow(call *ast.CallExpr) bool {
 	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if x, ok := sel.X.(*ast.Ident); ok {
-			return x.Name == "time" && sel.Sel.Name == "Now"
+		if pkg := s.getTimePackage(sel.X); pkg != nil {
+			return sel.Sel.Name == "Now"
 		}
 	}
 	return false
@@ -282,8 +299,8 @@ func (s *state) isTimeNow(call *ast.CallExpr) bool {
 
 func (s *state) isTimeParse(call *ast.CallExpr) bool {
 	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if x, ok := sel.X.(*ast.Ident); ok {
-			return x.Name == "time" && sel.Sel.Name == "Parse"
+		if pkg := s.getTimePackage(sel.X); pkg != nil {
+			return sel.Sel.Name == "Parse"
 		}
 	}
 	return false
@@ -291,8 +308,8 @@ func (s *state) isTimeParse(call *ast.CallExpr) bool {
 
 func (s *state) isTimeParseInLocation(call *ast.CallExpr) bool {
 	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if x, ok := sel.X.(*ast.Ident); ok {
-			return x.Name == "time" && sel.Sel.Name == "ParseInLocation"
+		if pkg := s.getTimePackage(sel.X); pkg != nil {
+			return sel.Sel.Name == "ParseInLocation"
 		}
 	}
 	return false
