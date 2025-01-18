@@ -55,7 +55,7 @@ plugins:
     version: latest # Or a fixed version for reproducible builds.
 ```
 
-(2) Add NilAway to the linter configuration file `.golangci.yaml`:
+(2) Add TimeLoc to the linter configuration file `.golangci.yaml`:
 ```yaml
 linters-settings:
   custom:
@@ -79,7 +79,6 @@ By default, the custom binary will be built at `.` with the name `custom-gcl`, w
 # Arguments are the same as `golangci-lint`.
 $ ./custom-gcl run ./...
 ```
-
 
 ## What This Analyzer Checks
 
