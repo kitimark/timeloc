@@ -39,9 +39,47 @@ Then, run the linter by:
 timeloc ./...
 ```
 
-### golangci-lint
+### golangci-lint (>= v1.57.0)
 
-Integration with golangci-lint is under development following the [Module Plugin System](https://golangci-lint.run/plugins/module-plugins/). Contributions towards this integration are welcome, please feel free to open a pull request.
+TimeLoc is available as a golangci-lint analyzer through the [Module Plugin System](https://golangci-lint.run/plugins/module-plugins/) (introduced in v1.57.0).
+
+Follow these steps to set up TimeLoc with golangci-lint:
+
+(1) Create a `.custom-gcl.yml` file at the root of the repository if you have not done so, add the following content:
+```yaml
+# This has to be >= v1.57.0 for module plugin system support.
+version: v1.57.0
+plugins:
+  - module: "github.com/kitimark/timeloc"
+    import: "github.com/kitimark/timeloc/cmd/gclplugin"
+    version: latest # Or a fixed version for reproducible builds.
+```
+
+(2) Add NilAway to the linter configuration file `.golangci.yaml`:
+```yaml
+linters-settings:
+  custom:
+    timeloc:
+      type: "module"
+      description: A linter to enforce explicit timezone settings and prevent time.Local usage in Go code.
+# TimeLoc can be referred to as `timeloc` just like any other golangci-lint analyzers in other 
+# parts of the configuration file.
+```
+
+(3) Build a custom `golangci-lint` binary with TimeLoc included:
+```bash
+# Note that your `golangci-lint` to bootstrap the custom binary must also be version >= v1.57.0.
+$ golangci-lint custom
+```
+By default, the custom binary will be built at `.` with the name `custom-gcl`, which can be further customized in `.custom-gcl.yml` file (see [Module Plugin System](https://golangci-lint.run/plugins/module-plugins/) for instructions).
+
+(4) Run the custom binary instead of `golangci-lint`:
+
+```bash
+# Arguments are the same as `golangci-lint`.
+$ ./custom-gcl run ./...
+```
+
 
 ## What This Analyzer Checks
 
