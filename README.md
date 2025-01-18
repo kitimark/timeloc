@@ -135,7 +135,10 @@ func badUsage() {
     t := time.Now()
     
     // Direct method calls without location
-    fmt.Println(t.Format("2006-01-02"))  // Analyzer reports error: (t time.Time).Format called on t before setting time.Location
+    fmt.Println(t.Format("2006-01-02"))  // Analyzer reports error: (t time.Time).Format called before setting time.Location
+    
+    // Method chaining without location
+    fmt.Println(time.Now().Format("2006-01-02"))  // Analyzer reports error: (t time.Time).Format called before setting time.Location
     
     // Passing to function without location
     formatTime(t)  // Analyzer reports error: passing time.Time value without location set to function that may use location-dependent methods
@@ -171,9 +174,9 @@ func parseExample() {
 
 The analyzer produces three types of error messages:
 
-1. For direct method calls:
+1. For direct method calls on variables and chained calls:
    ```
-   (t time.Time).Format called on t before setting time.Location
+   (t time.Time).Format called before setting time.Location
    ```
 
 2. For function calls:

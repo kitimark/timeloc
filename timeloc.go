@@ -212,11 +212,24 @@ func (s *state) handleCall(call *ast.CallExpr) {
 
 	// check for time-dependent method calls
 	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if id, ok := sel.X.(*ast.Ident); ok {
-			if obj, ok := s.pass.TypesInfo.ObjectOf(id).(*types.Var); ok {
-				if s.isTimeType(obj.Type()) && targetMethods[sel.Sel.Name] {
+		// check if method is called directly on time.Now() or similar
+		if s.isTimeType(s.pass.TypesInfo.TypeOf(sel.X)) && targetMethods[sel.Sel.Name] {
+			// for chained calls like time.Now().Format()
+			if callExpr, ok := sel.X.(*ast.CallExpr); ok {
+				if selExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+					if pkg := s.getTimePackage(selExpr.X); pkg != nil {
+						if selExpr.Sel.Name == "Now" || selExpr.Sel.Name == "Parse" {
+							s.pass.Reportf(call.Pos(), "(t time.Time).%s called before setting time.Location", sel.Sel.Name)
+							return
+						}
+					}
+				}
+			}
+			// for calls on variables
+			if id, ok := sel.X.(*ast.Ident); ok {
+				if obj, ok := s.pass.TypesInfo.ObjectOf(id).(*types.Var); ok {
 					if hasLocation, exists := s.timeVars[obj]; exists && !hasLocation {
-						s.pass.Reportf(call.Pos(), "(t time.Time).%s called on %s before setting time.Location", sel.Sel.Name, id.Name)
+						s.pass.Reportf(call.Pos(), "(t time.Time).%s called before setting time.Location", sel.Sel.Name)
 					}
 				}
 			}

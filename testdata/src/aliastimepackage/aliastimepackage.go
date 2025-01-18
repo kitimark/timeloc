@@ -261,19 +261,19 @@ func TimeDateUsage() {
 func badUsageInSubFunc() {
 	t := aliastime.Now()
 
-	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called on t before setting time.Location"
-	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called on t before setting time.Location"
-	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called on t before setting time.Location"
-	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called on t before setting time.Location"
-	_ = t.Day()                           // want "\\(t time.Time\\).Day called on t before setting time.Location"
-	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called on t before setting time.Location"
-	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called on t before setting time.Location"
-	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called on t before setting time.Location"
-	_ = t.Month()                         // want "\\(t time.Time\\).Month called on t before setting time.Location"
-	_ = t.Second()                        // want "\\(t time.Time\\).Second called on t before setting time.Location"
-	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called on t before setting time.Location"
-	_ = t.Year()                          // want "\\(t time.Time\\).Year called on t before setting time.Location"
-	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called on t before setting time.Location"
+	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called before setting time.Location"
+	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called before setting time.Location"
+	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called before setting time.Location"
+	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called before setting time.Location"
+	_ = t.Day()                           // want "\\(t time.Time\\).Day called before setting time.Location"
+	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called before setting time.Location"
+	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called before setting time.Location"
+	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called before setting time.Location"
+	_ = t.Month()                         // want "\\(t time.Time\\).Month called before setting time.Location"
+	_ = t.Second()                        // want "\\(t time.Time\\).Second called before setting time.Location"
+	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called before setting time.Location"
+	_ = t.Year()                          // want "\\(t time.Time\\).Year called before setting time.Location"
+	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called before setting time.Location"
 
 	formatAllMethods(t)        // want "passing time.Time value without location set to function that may use location-dependent methods"
 	formatTime(t)              // want "passing time.Time value without location set to function that may use location-dependent methods"
@@ -288,19 +288,19 @@ func badUsageInSubFunc() {
 func BadUsage() {
 	t := aliastime.Now()
 
-	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called on t before setting time.Location"
-	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called on t before setting time.Location"
-	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called on t before setting time.Location"
-	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called on t before setting time.Location"
-	_ = t.Day()                           // want "\\(t time.Time\\).Day called on t before setting time.Location"
-	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called on t before setting time.Location"
-	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called on t before setting time.Location"
-	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called on t before setting time.Location"
-	_ = t.Month()                         // want "\\(t time.Time\\).Month called on t before setting time.Location"
-	_ = t.Second()                        // want "\\(t time.Time\\).Second called on t before setting time.Location"
-	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called on t before setting time.Location"
-	_ = t.Year()                          // want "\\(t time.Time\\).Year called on t before setting time.Location"
-	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called on t before setting time.Location"
+	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called before setting time.Location"
+	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called before setting time.Location"
+	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called before setting time.Location"
+	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called before setting time.Location"
+	_ = t.Day()                           // want "\\(t time.Time\\).Day called before setting time.Location"
+	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called before setting time.Location"
+	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called before setting time.Location"
+	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called before setting time.Location"
+	_ = t.Month()                         // want "\\(t time.Time\\).Month called before setting time.Location"
+	_ = t.Second()                        // want "\\(t time.Time\\).Second called before setting time.Location"
+	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called before setting time.Location"
+	_ = t.Year()                          // want "\\(t time.Time\\).Year called before setting time.Location"
+	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called before setting time.Location"
 
 	formatAllMethods(t)        // want "passing time.Time value without location set to function that may use location-dependent methods"
 	formatTime(t)              // want "passing time.Time value without location set to function that may use location-dependent methods"
@@ -320,19 +320,19 @@ func BadUsage() {
 func TimeParseBadUsage() {
 	t, _ := aliastime.Parse(aliastime.DateOnly, "2025-01-01")
 
-	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called on t before setting time.Location"
-	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called on t before setting time.Location"
-	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called on t before setting time.Location"
-	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called on t before setting time.Location"
-	_ = t.Day()                           // want "\\(t time.Time\\).Day called on t before setting time.Location"
-	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called on t before setting time.Location"
-	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called on t before setting time.Location"
-	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called on t before setting time.Location"
-	_ = t.Month()                         // want "\\(t time.Time\\).Month called on t before setting time.Location"
-	_ = t.Second()                        // want "\\(t time.Time\\).Second called on t before setting time.Location"
-	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called on t before setting time.Location"
-	_ = t.Year()                          // want "\\(t time.Time\\).Year called on t before setting time.Location"
-	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called on t before setting time.Location"
+	_ = t.Format("2006-01-02")            // want "\\(t time.Time\\).Format called before setting time.Location"
+	_ = t.AppendFormat(nil, "2006-01-02") // want "\\(t time.Time\\).AppendFormat called before setting time.Location"
+	_, _, _ = t.Clock()                   // want "\\(t time.Time\\).Clock called before setting time.Location"
+	_, _, _ = t.Date()                    // want "\\(t time.Time\\).Date called before setting time.Location"
+	_ = t.Day()                           // want "\\(t time.Time\\).Day called before setting time.Location"
+	_ = t.Hour()                          // want "\\(t time.Time\\).Hour called before setting time.Location"
+	_, _ = t.ISOWeek()                    // want "\\(t time.Time\\).ISOWeek called before setting time.Location"
+	_ = t.Minute()                        // want "\\(t time.Time\\).Minute called before setting time.Location"
+	_ = t.Month()                         // want "\\(t time.Time\\).Month called before setting time.Location"
+	_ = t.Second()                        // want "\\(t time.Time\\).Second called before setting time.Location"
+	_ = t.Weekday()                       // want "\\(t time.Time\\).Weekday called before setting time.Location"
+	_ = t.Year()                          // want "\\(t time.Time\\).Year called before setting time.Location"
+	_ = t.YearDay()                       // want "\\(t time.Time\\).YearDay called before setting time.Location"
 
 	formatAllMethods(t)        // want "passing time.Time value without location set to function that may use location-dependent methods"
 	formatTime(t)              // want "passing time.Time value without location set to function that may use location-dependent methods"
@@ -350,7 +350,7 @@ func subFunctionTimeLocalBadUsage() {
 	_ = aliastime.Date(2025, 1, 1, 0, 0, 0, 0, aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
 
 	t := aliastime.Now()
-	t = t.In(aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+	_ = t.In(aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
 }
 
 func nestedSubFunctionTimeLocalBadUsage() {
@@ -363,7 +363,7 @@ func TimeLocalBadUsage() {
 	_ = aliastime.Date(2025, 1, 1, 0, 0, 0, 0, aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
 
 	t := aliastime.Now()
-	t = t.In(aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
+	_ = t.In(aliastime.Local) // want "time.Local usage is not allowed as it relies on system timezone"
 
 	subFunctionTimeLocalBadUsage()
 	nestedSubFunctionTimeLocalBadUsage()
