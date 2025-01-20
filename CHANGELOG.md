@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/kitimark/timeloc/compare/v1.0.0...v1.1.0) (2025-01-18)
+
+
+### Features
+
+* **gclplugin:** add timeloc plugin for golangci-lint integration ([#6](https://github.com/kitimark/timeloc/issues/6)) ([82b5802](https://github.com/kitimark/timeloc/commit/82b58028c4b255d954ff78e4047681fd0f2090d5))
+
+
+### Bug Fixes
+
+* **timeloc:** detect time method chaining and simplify error message ([#9](https://github.com/kitimark/timeloc/issues/9)) ([ebc9e48](https://github.com/kitimark/timeloc/commit/ebc9e48462942894cbf0c45883f300937431de7a))
+
 ## 1.0.0 (2025-01-17)
 
 
